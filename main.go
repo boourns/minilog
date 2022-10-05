@@ -13,7 +13,7 @@ import (
 func main() {
 	//log.SetLevel(log.DebugLevel)
 
-	db, err := sql.Open("sqlite3", "./minlog.db")
+	db, err := sql.Open("sqlite3", "./minilog.db")
 	if err != nil {
 		log.Fatal(err)
 	}

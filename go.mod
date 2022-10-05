@@ -1,4 +1,4 @@
-module github.com/boourns/minlog
+module github.com/boourns/minilog
 
 go 1.17
 

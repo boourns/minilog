@@ -32,9 +32,10 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	
+	reader := bufio.NewReader(os.Stdin)
 
 	for true {
-		reader := bufio.NewReader(os.Stdin)
 		str, err := reader.ReadString('\n')
 		if err == io.EOF {
 			os.Exit(0)

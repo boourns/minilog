@@ -7,13 +7,13 @@ import (
 )
 
 func sqlFieldsForField() string {
-	return "Field.ID,Field.LogEntryID,Field.Message,Field.Key,Field.Value" // ADD FIELD HERE
+	return "Field.ID,Field.LogEntryID,Field.Key,Field.Value" // ADD FIELD HERE
 }
 
 func loadField(rows *sql.Rows) (*Field, error) {
 	ret := Field{}
 
-	err := rows.Scan(&ret.ID, &ret.LogEntryID, &ret.Message, &ret.Key, &ret.Value) // ADD FIELD HERE
+	err := rows.Scan(&ret.ID, &ret.LogEntryID, &ret.Key, &ret.Value) // ADD FIELD HERE
 	if err != nil {
 		return nil, err
 	}
@@ -39,13 +39,13 @@ func SelectField(tx dblib.DBLike, cond string, condFields ...interface{}) ([]*Fi
 }
 
 func (s *Field) Update(tx dblib.DBLike) error {
-	stmt, err := tx.Prepare(fmt.Sprintf("UPDATE Field SET ID=?,LogEntryID=?,Message=?,Key=?,Value=? WHERE Field.ID = ?")) // ADD FIELD HERE
+	stmt, err := tx.Prepare(fmt.Sprintf("UPDATE Field SET ID=?,LogEntryID=?,Key=?,Value=? WHERE Field.ID = ?")) // ADD FIELD HERE
 
 	if err != nil {
 		return err
 	}
 
-	params := []interface{}{s.ID, s.LogEntryID, s.Message, s.Key, s.Value} // ADD FIELD HERE
+	params := []interface{}{s.ID, s.LogEntryID, s.Key, s.Value} // ADD FIELD HERE
 	params = append(params, s.ID)
 
 	_, err = stmt.Exec(params...)
@@ -57,12 +57,12 @@ func (s *Field) Update(tx dblib.DBLike) error {
 }
 
 func (s *Field) Insert(tx dblib.DBLike) error {
-	stmt, err := tx.Prepare("INSERT INTO Field(LogEntryID,Message,Key,Value) VALUES(?,?,?,?)") // ADD FIELD HERE
+	stmt, err := tx.Prepare("INSERT INTO Field(LogEntryID,Key,Value) VALUES(?,?,?)") // ADD FIELD HERE
 	if err != nil {
 		return err
 	}
 
-	result, err := stmt.Exec(s.LogEntryID, s.Message, s.Key, s.Value) // ADD FIELD HERE
+	result, err := stmt.Exec(s.LogEntryID, s.Key, s.Value) // ADD FIELD HERE
 	if err != nil {
 		return err
 	}
@@ -98,8 +98,6 @@ CREATE TABLE IF NOT EXISTS Field (
     ID INTEGER PRIMARY KEY,
   
     LogEntryID INTEGER,
-  
-    Message VARCHAR(255),
   
     Key VARCHAR(255),
   

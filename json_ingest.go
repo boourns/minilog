@@ -14,6 +14,7 @@ func readString(key string, rawLog map[string]interface{}) string {
 		if !ok {
 			value = ""
 		}
+		delete(rawLog, key)
 	}
 
 	return value
@@ -42,13 +43,13 @@ func ingestJson(line string) (*LogEntry, map[string]string, error) {
 		if ok {
 			logTime, _ = time.Parse(time.RFC3339, timeStr)
 		}
+		delete(rawLog, "time")
 	}
 
 	contextId := readString("context_id", rawLog)
 	contextType := readString("context_type", rawLog)
 	message := readString("msg", rawLog)
 	level := readString("level", rawLog)
-
 
 	var result LogEntry
 	result.LogTime = logTime
@@ -59,9 +60,7 @@ func ingestJson(line string) (*LogEntry, map[string]string, error) {
 	fields := make(map[string]string)
 
 	for k, v := range rawLog {
-		if k != "time" && k != "context_id" && k != "context_type" {
-			fields[k] = fmt.Sprintf("%v", v)
-		}
+		fields[k] = fmt.Sprintf("%v", v)
 	}
 
 	return &result, fields, nil

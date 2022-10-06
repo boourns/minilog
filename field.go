@@ -4,7 +4,6 @@ package main
 type Field struct {
 	ID int64
 	LogEntryID int64
-	Message string
 	Key string
 	Value string
 }

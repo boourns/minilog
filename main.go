@@ -13,7 +13,14 @@ import (
 func main() {
 	//log.SetLevel(log.DebugLevel)
 
-	db, err := sql.Open("sqlite3", "./minilog.db")
+	filename := "./minilog.db"
+	if len(os.Args) > 1 {
+		filename = os.Args[1]
+	}
+
+	log.Printf("Opening database %s", filename)
+
+	db, err := sql.Open("sqlite3", filename)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -35,7 +42,7 @@ func main() {
 		if err != nil {
 			log.Printf("Error reading string: %v", err)
 		}
-		log.Printf("Read: %s", str)
+		log.Printf("%s", str)
 
 		entry, fields, err := ingestJson(str)
 		if err != nil {
@@ -62,7 +69,5 @@ func main() {
 		if err != nil {
 			log.Printf("Error inserting log into database: %v", err)
 		}
-
-		log.Printf("Ingested entry %v", entry)
 	}
 }

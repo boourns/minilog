@@ -1,14 +1,17 @@
 package main
 
 import (
-	"bufio"
+	"context"
 	"database/sql"
-	"github.com/boourns/dblib"
+	"github.com/go-chi/chi"
 	_ "github.com/mattn/go-sqlite3"
-	"io"
-	"log"
+	log "github.com/sirupsen/logrus"
+	"net/http"
 	"os"
+	"os/signal"
 )
+
+var database *sql.DB
 
 func main() {
 	//log.SetLevel(log.DebugLevel)
@@ -20,55 +23,52 @@ func main() {
 
 	log.Printf("Opening database %s", filename)
 
-	db, err := sql.Open("sqlite3", filename)
+	var err error
+	database, err = sql.Open("sqlite3", filename)
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = CreateFieldTable(db)
+	err = CreateFieldTable(database)
 	if err != nil {
 		panic(err)
 	}
-	err = CreateLogEntryTable(db)
+	err = CreateLogEntryTable(database)
 	if err != nil {
 		panic(err)
 	}
-	
-	reader := bufio.NewReader(os.Stdin)
 
-	for true {
-		str, err := reader.ReadString('\n')
-		if err == io.EOF {
-			os.Exit(0)
+	startIngestServer()
+}
+
+func startIngestServer() {
+	var srv http.Server
+
+	router := chi.NewRouter()
+
+	router.Handle("/in", http.HandlerFunc(IngestEndpoint))
+
+	idleConnsClosed := make(chan struct{})
+	go func() {
+		sigint := make(chan os.Signal, 1)
+		signal.Notify(sigint, os.Interrupt)
+		<-sigint
+
+		// We received an interrupt signal, shut down.
+		if err := srv.Shutdown(context.Background()); err != nil {
+			// Error from closing listeners, or context timeout:
+			log.Infof("HTTP server Shutdown: %v", err)
 		}
-		if err != nil {
-			log.Printf("Error reading string: %v", err)
-		}
-		log.Printf("%s", str)
+		close(idleConnsClosed)
+	}()
 
-		entry, fields, err := ingestJson(str)
-		if err != nil {
-			log.Printf("Error ingesting: %v", err)
-		}
+	srv.Addr = ":1112"
+	srv.Handler = router
 
-		err = dblib.Transact(db, func(tx *sql.Tx) error {
-			err := entry.Insert(tx)
-			if err != nil {
-				return err
-			}
-
-			for k, v := range fields {
-				field := Field{LogEntryID: entry.ID, Key: k, Value: v}
-				err := field.Insert(tx)
-				if err != nil {
-					return err
-				}
-			}
-
-			return nil
-		})
-
-		if err != nil {
-			log.Printf("Error inserting log into database: %v", err)
-		}
+	if err := srv.ListenAndServe(); err != http.ErrServerClosed {
+		// Error starting or closing listener:
+		log.Fatalf("HTTP server ListenAndServe: %v", err)
 	}
+
+	<-idleConnsClosed
+
 }

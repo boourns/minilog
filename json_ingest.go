@@ -20,10 +20,10 @@ func readString(key string, rawLog map[string]interface{}) string {
 	return value
 }
 
-func ingestJson(line string) (*LogEntry, map[string]string, error) {
+func ingestJson(line []byte) (*LogEntry, map[string]string, error) {
 	var rawLog map[string]interface{}
 
-	err := json.Unmarshal([]byte(line), &rawLog)
+	err := json.Unmarshal(line, &rawLog)
 	if err != nil {
 		// failed to parse, return a dummy parsed entry
 		result := LogEntry{
@@ -32,7 +32,7 @@ func ingestJson(line string) (*LogEntry, map[string]string, error) {
 			ContextType: "",
 		}
 
-		return &result, map[string]string{"msg": line}, nil
+		return &result, map[string]string{"msg": string(line)}, nil
 	}
 
 	// Extract time (default: now)

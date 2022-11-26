@@ -78,5 +78,5 @@ func QueryEndpoint(w http.ResponseWriter, r *http.Request) {
 		lib.Error(w, "failed to parse json", 403)
 	}
 
-	
+
 }

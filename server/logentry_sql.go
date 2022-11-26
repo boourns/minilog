@@ -91,9 +91,7 @@ func (s *LogEntry) Delete(tx dblib.Queryable) error {
 func CreateLogEntryTable(tx dblib.Queryable) error {
 	stmt, err := tx.Prepare(`
 
-
-
-CREATE TABLE LogEntry (
+CREATE TABLE IF NOT EXISTS LogEntry (
   
     ID INTEGER PRIMARY KEY,
   

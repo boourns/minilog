@@ -3,7 +3,6 @@ package api
 import (
 	"github.com/boourns/minilog/lib"
 	"net/http"
-	"log"
 )
 
 type QueryRequest struct {

@@ -93,7 +93,7 @@ func CreateFieldTable(tx dblib.Queryable) error {
 
 
 
-CREATE TABLE Field (
+CREATE TABLE IF NOT EXISTS Field (
   
     ID INTEGER PRIMARY KEY,
   

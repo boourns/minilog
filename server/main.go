@@ -18,6 +18,7 @@ var database *sql.DB
 func main() {
 	cfg.ReadConfig()
 
+	log.Printf("Loaded keys for %d applications", len(cfg.Config.Applications))
 	log.Printf("Opening database %s", cfg.Config.Database)
 
 	var err error
@@ -25,6 +26,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	err = CreateFieldTable(database)
 	if err != nil {
 		panic(err)

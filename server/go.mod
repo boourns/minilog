@@ -11,7 +11,10 @@ require (
 )
 
 require (
+	github.com/benbjohnson/ego v0.4.3 // indirect
+	github.com/boourns/scaffold v0.0.0-20221117161551-2c97e1e51dd6 // indirect
 	github.com/gorilla/securecookie v1.1.1 // indirect
+	github.com/iancoleman/strcase v0.2.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	golang.org/x/sys v0.0.0-20220715151400-c0bba94af5f8 // indirect
 )

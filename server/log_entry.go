@@ -6,6 +6,7 @@ import "time"
 type LogEntry struct {
 	ID int64
 	LogTime time.Time		`sqlType:"DATETIME"`
+	Application string
 	Level string
 	Message string
 	ContextId string

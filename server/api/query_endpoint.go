@@ -40,7 +40,7 @@ func queryEndpoint(w http.ResponseWriter, r *http.Request) {
 		var row = make([]string, len(result.Columns))
 
 		var ptrRow = make([]interface{}, len(result.Columns))
-		
+
 		for i, _ := range row {
 			ptrRow[i] = &row[i]
 		}

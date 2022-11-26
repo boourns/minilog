@@ -1,0 +1,39 @@
+{
+  "name": "minilog",
+  "version": "0.0.1",
+  "description": "minilog",
+  "main": "app.js",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "dependencies": {
+    "bootstrap": "^5.2.2",
+    "dayjs": "^1.10.3",
+    "preact": "^10.5.5",
+    "preact-router": "^3.2.1",
+    "react-bootstrap": "^2.5.0",
+    "react-bootstrap-icons": "^1.9.1"
+  },
+  "devDependencies": {
+    "css-loader": "^6.2.0",
+    "css-modules-typescript-loader": "^4.0.1",
+    "mocha": "^9.1.1",
+    "sass": "^1.39.2",
+    "sass-loader": "^12.1.0",
+    "style-loader": "^3.2.1",
+    "ts-loader": "latest",
+    "typescript": "latest",
+    "webpack": "^5.61.0",
+    "webpack-cli": "^4.3.0"
+  },
+  "scripts": {
+    "build": "./node_modules/.bin/webpack",
+    "watch": "./node_modules/.bin/webpack -w",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "graphql": "graphql-codegen --config codegen.yml"
+  },
+  "author": "tom burns",
+  "license": "UNLICENSED",
+  "packageManager": "yarn@3.1.1"
+}

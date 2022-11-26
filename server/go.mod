@@ -5,8 +5,13 @@ go 1.17
 require (
 	github.com/boourns/dblib v0.0.0-20211224150253-1999b7a34454
 	github.com/go-chi/chi v1.5.4
+	github.com/gorilla/csrf v1.7.1
 	github.com/mattn/go-sqlite3 v1.14.9
 	github.com/sirupsen/logrus v1.9.0
 )
 
-require golang.org/x/sys v0.0.0-20220715151400-c0bba94af5f8 // indirect
+require (
+	github.com/gorilla/securecookie v1.1.1 // indirect
+	github.com/pkg/errors v0.9.1 // indirect
+	golang.org/x/sys v0.0.0-20220715151400-c0bba94af5f8 // indirect
+)

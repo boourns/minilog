@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 	"database/sql"
+	"github.com/boourns/minilog/api"
+	"github.com/boourns/minilog/cfg"
 	"github.com/go-chi/chi"
 	_ "github.com/mattn/go-sqlite3"
 	log "github.com/sirupsen/logrus"
@@ -14,17 +16,12 @@ import (
 var database *sql.DB
 
 func main() {
-	//log.SetLevel(log.DebugLevel)
+	cfg.ReadConfig()
 
-	filename := "./minilog.db"
-	if len(os.Args) > 1 {
-		filename = os.Args[1]
-	}
-
-	log.Printf("Opening database %s", filename)
+	log.Printf("Opening database %s", cfg.Config.Database)
 
 	var err error
-	database, err = sql.Open("sqlite3", filename)
+	database, err = sql.Open("sqlite3", cfg.Config.Database)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -37,15 +34,13 @@ func main() {
 		panic(err)
 	}
 
-	startIngestServer()
-}
-
-func startIngestServer() {
 	var srv http.Server
 
 	router := chi.NewRouter()
 
-	router.Handle("/in", http.HandlerFunc(IngestEndpoint))
+	startAdminServer(router)
+
+	startIngestServer(router)
 
 	idleConnsClosed := make(chan struct{})
 	go func() {
@@ -61,7 +56,8 @@ func startIngestServer() {
 		close(idleConnsClosed)
 	}()
 
-	srv.Addr = ":1112"
+	log.Printf("Binding to %s", cfg.Config.Bind)
+	srv.Addr = cfg.Config.Bind
 	srv.Handler = router
 
 	if err := srv.ListenAndServe(); err != http.ErrServerClosed {
@@ -70,5 +66,24 @@ func startIngestServer() {
 	}
 
 	<-idleConnsClosed
+}
 
+func startIngestServer(router chi.Router) {
+	router.Handle("/in", http.HandlerFunc(IngestEndpoint))
+}
+
+func startAdminServer(router chi.Router) {
+	router.HandleFunc("/static/*", func(w http.ResponseWriter, r *http.Request) {
+
+		http.ServeFile(w, r, "./" + r.URL.Path)
+		//w.Header().Set("Content-Type", "text/css")
+	})
+
+	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "./static/index.html")
+	})
+
+	router.Route("/api", func(router chi.Router) {
+		api.Register(router)
+	})
 }

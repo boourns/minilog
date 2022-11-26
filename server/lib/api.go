@@ -50,6 +50,14 @@ func Error(w http.ResponseWriter, message string, code int) {
 	RespondWithCode(code, BaseResponse{OK: false, Code: code, Errors: []ResponseError{{Error: message}}}, w)
 }
 
+func RespondWith(success bool, data interface{}, w http.ResponseWriter) error {
+	if !success {
+		return RespondWithCode(400, data, w)
+	} else {
+		return RespondWithCode(200, data, w)
+	}
+}
+
 func RespondWithCode(code int, data interface{}, w http.ResponseWriter) error {
 	w.WriteHeader(code)
 

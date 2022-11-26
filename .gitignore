@@ -1,3 +1,5 @@
 minilog
 .idea
-
+minilog.db
+static/
+db/

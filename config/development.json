@@ -1,0 +1,11 @@
+{
+    "bind": ":1112",
+    "database": "db/development.db",
+    "csrfSecret": "31ee9ca81119d893f5dc0e1d0566c8c2",
+    "applications": [
+        {
+            "name": "groovebox",
+            "key": "groovebox-dev-aabbccdd"
+        }
+    ]
+}

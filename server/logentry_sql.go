@@ -7,20 +7,20 @@ import (
 )
 
 func sqlFieldsForLogEntry() string {
-	return "LogEntry.ID,LogEntry.LogTime,LogEntry.Level,LogEntry.Message,LogEntry.ContextId,LogEntry.ContextType" // ADD FIELD HERE
+	return "LogEntry.ID,LogEntry.LogTime,LogEntry.Application,LogEntry.Level,LogEntry.Message,LogEntry.ContextId,LogEntry.ContextType"
 }
 
 func loadLogEntry(rows *sql.Rows) (*LogEntry, error) {
 	ret := LogEntry{}
 
-	err := rows.Scan(&ret.ID, &ret.LogTime, &ret.Level, &ret.Message, &ret.ContextId, &ret.ContextType) // ADD FIELD HERE
+	err := rows.Scan(&ret.ID, &ret.LogTime, &ret.Application, &ret.Level, &ret.Message, &ret.ContextId, &ret.ContextType)
 	if err != nil {
 		return nil, err
 	}
 	return &ret, nil
 }
 
-func SelectLogEntry(tx dblib.DBLike, cond string, condFields ...interface{}) ([]*LogEntry, error) {
+func SelectLogEntry(tx dblib.Queryable, cond string, condFields ...interface{}) ([]*LogEntry, error) {
 	ret := []*LogEntry{}
 	sql := fmt.Sprintf("SELECT %s from LogEntry %s", sqlFieldsForLogEntry(), cond)
 	rows, err := tx.Query(sql, condFields...)
@@ -38,14 +38,14 @@ func SelectLogEntry(tx dblib.DBLike, cond string, condFields ...interface{}) ([]
 	return ret, nil
 }
 
-func (s *LogEntry) Update(tx dblib.DBLike) error {
-	stmt, err := tx.Prepare(fmt.Sprintf("UPDATE LogEntry SET ID=?,LogTime=?,Level=?,Message=?,ContextId=?,ContextType=? WHERE LogEntry.ID = ?")) // ADD FIELD HERE
+func (s *LogEntry) Update(tx dblib.Queryable) error {
+	stmt, err := tx.Prepare("UPDATE LogEntry SET ID=?,LogTime=?,Application=?,Level=?,Message=?,ContextId=?,ContextType=? WHERE LogEntry.ID = ?")
 
 	if err != nil {
 		return err
 	}
 
-	params := []interface{}{s.ID, s.LogTime, s.Level, s.Message, s.ContextId, s.ContextType} // ADD FIELD HERE
+	params := []interface{}{s.ID, s.LogTime, s.Application, s.Level, s.Message, s.ContextId, s.ContextType}
 	params = append(params, s.ID)
 
 	_, err = stmt.Exec(params...)
@@ -56,13 +56,13 @@ func (s *LogEntry) Update(tx dblib.DBLike) error {
 	return nil
 }
 
-func (s *LogEntry) Insert(tx dblib.DBLike) error {
-	stmt, err := tx.Prepare("INSERT INTO LogEntry(LogTime,Level,Message,ContextId,ContextType) VALUES(?,?,?,?,?)") // ADD FIELD HERE
+func (s *LogEntry) Insert(tx dblib.Queryable) error {
+	stmt, err := tx.Prepare("INSERT INTO LogEntry(LogTime,Application,Level,Message,ContextId,ContextType) VALUES(?,?,?,?,?,?)")
 	if err != nil {
 		return err
 	}
 
-	result, err := stmt.Exec(s.LogTime, s.Level, s.Message, s.ContextId, s.ContextType) // ADD FIELD HERE
+	result, err := stmt.Exec(s.LogTime, s.Application, s.Level, s.Message, s.ContextId, s.ContextType)
 	if err != nil {
 		return err
 	}
@@ -74,7 +74,7 @@ func (s *LogEntry) Insert(tx dblib.DBLike) error {
 	return nil
 }
 
-func (s *LogEntry) Delete(tx dblib.DBLike) error {
+func (s *LogEntry) Delete(tx dblib.Queryable) error {
 	stmt, err := tx.Prepare("DELETE FROM LogEntry WHERE ID = ?")
 	if err != nil {
 		return err
@@ -88,16 +88,16 @@ func (s *LogEntry) Delete(tx dblib.DBLike) error {
 	return nil
 }
 
-func CreateLogEntryTable(tx dblib.DBLike) error {
+func CreateLogEntryTable(tx dblib.Queryable) error {
 	stmt, err := tx.Prepare(`
-
-
 
 CREATE TABLE IF NOT EXISTS LogEntry (
   
     ID INTEGER PRIMARY KEY,
   
     LogTime DATETIME,
+  
+    Application VARCHAR(255),
   
     Level VARCHAR(255),
   

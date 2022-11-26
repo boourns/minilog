@@ -7,20 +7,20 @@ import (
 )
 
 func sqlFieldsForField() string {
-	return "Field.ID,Field.LogEntryID,Field.Key,Field.Value" // ADD FIELD HERE
+	return "Field.ID,Field.LogEntryID,Field.Key,Field.Value"
 }
 
 func loadField(rows *sql.Rows) (*Field, error) {
 	ret := Field{}
 
-	err := rows.Scan(&ret.ID, &ret.LogEntryID, &ret.Key, &ret.Value) // ADD FIELD HERE
+	err := rows.Scan(&ret.ID, &ret.LogEntryID, &ret.Key, &ret.Value)
 	if err != nil {
 		return nil, err
 	}
 	return &ret, nil
 }
 
-func SelectField(tx dblib.DBLike, cond string, condFields ...interface{}) ([]*Field, error) {
+func SelectField(tx dblib.Queryable, cond string, condFields ...interface{}) ([]*Field, error) {
 	ret := []*Field{}
 	sql := fmt.Sprintf("SELECT %s from Field %s", sqlFieldsForField(), cond)
 	rows, err := tx.Query(sql, condFields...)
@@ -38,14 +38,14 @@ func SelectField(tx dblib.DBLike, cond string, condFields ...interface{}) ([]*Fi
 	return ret, nil
 }
 
-func (s *Field) Update(tx dblib.DBLike) error {
-	stmt, err := tx.Prepare(fmt.Sprintf("UPDATE Field SET ID=?,LogEntryID=?,Key=?,Value=? WHERE Field.ID = ?")) // ADD FIELD HERE
+func (s *Field) Update(tx dblib.Queryable) error {
+	stmt, err := tx.Prepare("UPDATE Field SET ID=?,LogEntryID=?,Key=?,Value=? WHERE Field.ID = ?")
 
 	if err != nil {
 		return err
 	}
 
-	params := []interface{}{s.ID, s.LogEntryID, s.Key, s.Value} // ADD FIELD HERE
+	params := []interface{}{s.ID, s.LogEntryID, s.Key, s.Value}
 	params = append(params, s.ID)
 
 	_, err = stmt.Exec(params...)
@@ -56,13 +56,13 @@ func (s *Field) Update(tx dblib.DBLike) error {
 	return nil
 }
 
-func (s *Field) Insert(tx dblib.DBLike) error {
-	stmt, err := tx.Prepare("INSERT INTO Field(LogEntryID,Key,Value) VALUES(?,?,?)") // ADD FIELD HERE
+func (s *Field) Insert(tx dblib.Queryable) error {
+	stmt, err := tx.Prepare("INSERT INTO Field(LogEntryID,Key,Value) VALUES(?,?,?)")
 	if err != nil {
 		return err
 	}
 
-	result, err := stmt.Exec(s.LogEntryID, s.Key, s.Value) // ADD FIELD HERE
+	result, err := stmt.Exec(s.LogEntryID, s.Key, s.Value)
 	if err != nil {
 		return err
 	}
@@ -74,7 +74,7 @@ func (s *Field) Insert(tx dblib.DBLike) error {
 	return nil
 }
 
-func (s *Field) Delete(tx dblib.DBLike) error {
+func (s *Field) Delete(tx dblib.Queryable) error {
 	stmt, err := tx.Prepare("DELETE FROM Field WHERE ID = ?")
 	if err != nil {
 		return err
@@ -88,7 +88,7 @@ func (s *Field) Delete(tx dblib.DBLike) error {
 	return nil
 }
 
-func CreateFieldTable(tx dblib.DBLike) error {
+func CreateFieldTable(tx dblib.Queryable) error {
 	stmt, err := tx.Prepare(`
 
 

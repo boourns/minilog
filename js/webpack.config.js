@@ -28,7 +28,7 @@ let entry = {
 let outputPath = path.resolve(__dirname, '..')
 let target = 'web'
 
-if (process.env.GROOVEBOX_ENV == "test") {
+if (process.env.MINILOG_ENV == "test") {
   entry = glob.sync(__dirname + "/test/**/*Test*.ts");
   outputPath = __dirname + "/test/build/";
   target = 'node'
@@ -42,7 +42,7 @@ if (process.env.GROOVEBOX_ENV == "test") {
 
 let plugins = []
 
-if (process.env.GROOVEBOX_ENV == "production") {
+if (process.env.MINILOG_ENV == "production") {
   let revision = require('fs').readFileSync('../REVISION', 'utf8').trim()
 
   plugins.push(
@@ -52,7 +52,7 @@ if (process.env.GROOVEBOX_ENV == "production") {
 } else {
   plugins.push(
     new webpack.DefinePlugin({
-      __COMMIT_HASH__: JSON.stringify(process.env.GROOVEBOX_ENV) || "\"development\""
+      __COMMIT_HASH__: JSON.stringify(process.env.MINILOG_ENV) || "\"development\""
     }))
 }
 

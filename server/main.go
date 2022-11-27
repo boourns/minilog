@@ -81,7 +81,7 @@ func startAdminServer(router chi.Router) {
 		//w.Header().Set("Content-Type", "text/css")
 	})
 
-	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+	router.NotFound(func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "./static/index.html")
 	})
 

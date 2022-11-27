@@ -29,7 +29,7 @@ func Register(router chi.Router) {
 		sameSite = csrf.SameSiteStrictMode
 	}
 
-	csrfMiddleware := csrf.Protect([]byte(cfg.Config.CSRFSecret), csrf.SameSite(sameSite), csrf.Secure(cfg.Production()))
+	csrfMiddleware := csrf.Protect([]byte(cfg.Config.CSRFSecret), csrf.SameSite(sameSite), csrf.Secure(false))
 
 	router.Use(csrfMiddleware)
 

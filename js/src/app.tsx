@@ -1,15 +1,10 @@
-import { MinilogAPI } from "./api"
+import { h, render } from 'preact';
+import { MinilogAdmin } from "./MinilogAdmin"
 
 console.log("welcome to minilog")
 
+import './admin.static.scss';
 
-async function attempt() {
-    const api = new MinilogAPI()
+render(<MinilogAdmin />, document.body)
 
-    let result = await api.query("SELECT * from LogEntry;")
-
-    console.log("Result is ", result)
-}
-
-attempt()
-
+console.log("make it here?")

@@ -1,5 +1,6 @@
-export type QueryResponse = {
-    token: string
+export type QueryResult = {
+    columns: string[]
+    rows: string[][]
 }
 
 export class MinilogAPI {
@@ -9,7 +10,7 @@ export class MinilogAPI {
 
     }
 
-    async query(sql: string) {
+    async query(sql: string): Promise<QueryResult | undefined> {
         let request = { sql }
 
         try {
@@ -20,7 +21,7 @@ export class MinilogAPI {
             const data = await response.text()
             console.debug("--- query response:")
             console.debug(data)
-            return (JSON.parse(data) as QueryResponse)
+            return (JSON.parse(data) as QueryResult)
         } catch (error) {
             console.error('query API Error:', error)
         }

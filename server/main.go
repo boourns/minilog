@@ -75,17 +75,28 @@ func startIngestServer(router chi.Router) {
 }
 
 func startAdminServer(router chi.Router) {
-	router.HandleFunc("/static/*", func(w http.ResponseWriter, r *http.Request) {
+	initAuth(router, cfg.Config.GithubKey, cfg.Config.GithubSecret)
 
+	router.HandleFunc("/static/*", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "./" + r.URL.Path)
 		//w.Header().Set("Content-Type", "text/css")
 	})
 
-	router.NotFound(func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "./static/index.html")
+	router.Route("/admin", func(router chi.Router) {
+		router.Use(Protect(true))
+
+		router.Get("/apps", func(w http.ResponseWriter, r *http.Request) {
+			http.ServeFile(w, r, "./static/index.html")
+		})
+
+		router.NotFound(func(w http.ResponseWriter, r *http.Request) {
+			http.ServeFile(w, r, "./static/index.html")
+		})
 	})
 
 	router.Route("/api", func(router chi.Router) {
+		router.Use(Protect(false))
+
 		api.Register(router)
 	})
 }

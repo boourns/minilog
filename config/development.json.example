@@ -1,0 +1,15 @@
+{
+    "bind": ":1112",
+    "database": "db/development.db",
+    "csrfSecret": "",
+    "applications": [
+        {
+            "name": "my-application",
+            "key": "my-application-ingest-key"
+        }
+    ],
+    "cookieSecret": "",
+    "githubKey": "",
+    "githubSecret": "",
+    "allowedUsers": ["githubUser1", "githubUser2"]
+}

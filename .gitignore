@@ -3,3 +3,5 @@ minilog
 minilog.db
 static/
 db/
+config/development.json
+

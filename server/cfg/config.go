@@ -17,6 +17,10 @@ type ConfigFile struct {
 	Database string `json:"database"`
 	CSRFSecret string `json:"csrfSecret"`
 	Applications []Application `json:"applications"`
+	CookieSecret string `json:"cookieSecret"`
+	GithubKey string `json:"githubKey"`
+	GithubSecret string `json:"githubSecret"`
+	AllowedUsers []string `json:"allowedUsers"`
 }
 
 var Config ConfigFile

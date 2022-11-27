@@ -11,10 +11,10 @@ export class MinilogAdmin extends Component<any, any> {
         return <div>
                 <Navbar>
                 <Container>
-                    <Navbar.Brand href="#home">Minilog</Navbar.Brand>
+                    <Navbar.Brand href="/admin/apps">Minilog</Navbar.Brand>
                     <Nav className="me-auto">
-                        <Nav.Link href="/apps">Applications</Nav.Link>
-                        <Nav.Link href="/console">Console</Nav.Link>
+                        <Nav.Link href="/admin/apps">Applications</Nav.Link>
+                        <Nav.Link href="/admin/console">Console</Nav.Link>
                     </Nav>
                 </Container>
                 </Navbar>
@@ -22,9 +22,9 @@ export class MinilogAdmin extends Component<any, any> {
                 <main>
                 <Container>
                     <Router>
-                        <QueryConsole path="/console"></QueryConsole>
-                        <Application path="/apps/:appName"></Application>
-                        <ApplicationList path="/apps" default></ApplicationList>
+                        <QueryConsole path="/admin/console"></QueryConsole>
+                        <Application path="/admin/apps/:appName"></Application>
+                        <ApplicationList path="/admin/apps" default></ApplicationList>
                     </Router>
                 </Container>
                 </main>

@@ -47,6 +47,9 @@ export class MinilogAPI {
                 MinilogAPI.csrfToken = undefined
                 return await this.fetch(input, init, false)
             } else {
+                debugger
+
+                console.log("HERE?!")
                 throw e
             }
         }

@@ -81,7 +81,6 @@ func Protect(redirect bool) func(http.Handler) http.Handler {
 
 			userAllowed := false
 			for _, allowed := range cfg.Config.AllowedUsers {
-				log.Printf("Comparing %s and %s", allowed, username.(string))
 				if allowed == username.(string) {
 					userAllowed = true
 				}

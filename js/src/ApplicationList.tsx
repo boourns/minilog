@@ -20,7 +20,7 @@ export class ApplicationList extends Component<any, ApplicationListState> {
             return <Spinner></Spinner>
         }
 
-        const apps = this.state.results.rows.map(r => <a href={`/apps/${r[0]}`}>{r[0]}</a>)
+        const apps = this.state.results.rows.map(r => <a href={`/admin/apps/${r[0]}`}>{r[0]}</a>)
 
         return <div>
             <div>Applications</div>

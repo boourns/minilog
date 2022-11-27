@@ -75,7 +75,7 @@ func startIngestServer(router chi.Router) {
 }
 
 func startAdminServer(router chi.Router) {
-	initAuth(router, cfg.Config.GithubKey, cfg.Config.GithubSecret)
+	initAuth(router, cfg.Config.GithubKey, cfg.Config.GithubSecret, cfg.Config.GithubCallbackURL)
 
 	router.HandleFunc("/static/*", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "./" + r.URL.Path)

@@ -20,6 +20,7 @@ type ConfigFile struct {
 	CookieSecret string `json:"cookieSecret"`
 	GithubKey string `json:"githubKey"`
 	GithubSecret string `json:"githubSecret"`
+	GithubCallbackURL string `json:"githubCallbackURL"`
 	AllowedUsers []string `json:"allowedUsers"`
 }
 

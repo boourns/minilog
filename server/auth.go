@@ -15,7 +15,7 @@ import (
 
 var cookieStore *sessions.CookieStore
 
-func initAuth(router chi.Router, githubKey string, githubSecret string) {
+func initAuth(router chi.Router, githubKey string, githubSecret string, githubCallbackURL string) {
 	maxAge := 86400 * 1 // 30 days
 	isProd := false     // Set to true when serving over https
 
@@ -28,7 +28,7 @@ func initAuth(router chi.Router, githubKey string, githubSecret string) {
 	gothic.Store = cookieStore
 
 	goth.UseProviders(
-		github.New(githubKey, githubSecret, "http://localhost:1112/auth/callback?provider=github"),
+		github.New(githubKey, githubSecret, githubCallbackURL),
 	)
 
 	router.Get("/auth/callback", func(res http.ResponseWriter, req *http.Request) {

@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"log"
 	"github.com/boourns/minilog/cfg"
 	"github.com/boourns/minilog/lib"
 	"github.com/go-chi/chi"

@@ -10,10 +10,12 @@
   "dependencies": {
     "bootstrap": "^5.2.2",
     "dayjs": "^1.10.3",
+    "plotly.js": "^2.16.3",
     "preact": "^10.5.5",
     "preact-router": "^3.2.1",
     "react-bootstrap": "^2.5.0",
-    "react-bootstrap-icons": "^1.9.1"
+    "react-bootstrap-icons": "^1.9.1",
+    "react-plotly.js": "^2.6.0"
   },
   "devDependencies": {
     "css-loader": "^6.2.0",

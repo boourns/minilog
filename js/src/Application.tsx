@@ -1,5 +1,7 @@
 import { Component } from "preact"
 import { Form, Spinner } from "react-bootstrap"
+import Plot from 'react-plotly.js'
+
 import { MinilogAPI, QueryResult } from "./api"
 import { resultTable } from "./ResultTable"
 
@@ -10,6 +12,7 @@ export interface ApplicationProps {
 type ApplicationState = {
     error?: string
     contextQuery?: QueryResult
+    graphQuery?: QueryResult
 }
 
 export class Application extends Component<ApplicationProps, ApplicationState> {
@@ -24,6 +27,7 @@ export class Application extends Component<ApplicationProps, ApplicationState> {
     }
 
     componentWillMount(): void {
+        this.queryGraph()
         this.queryAll()
     }
 
@@ -49,19 +53,73 @@ export class Application extends Component<ApplicationProps, ApplicationState> {
             </div>
         })
 
-        return <div>
+        const layout = {
+            title: 'Bar Chart',
+            xaxis: {
+              title: 'Categories'
+            },
+            yaxis: {
+              title: 'Values'
+            }
+          };
+        let chart
+        if (this.state.graphQuery) {
+            chart = <Plot
+            data={[
+              {
+                x: this.state.graphQuery.rows[0],
+                y: this.state.graphQuery.rows[1],
+                type: 'bar',
+              },
+            ]}
+            layout={{
+                title:"Log Entries (last hour)",
+                xaxis: {
+                    title:"time",
+                },
+                yaxis: {
+                    title:"count"
+                }
+            }}
+            style={{ width: '100%', height: 400 }}
+            config={{ displayModeBar: false }}
+            />
+        } else {
+            chart = <Spinner></Spinner>
+        }
+
+        return <div style="display: flex; flex-direction: column;">
+            {this.props.appName}
             <Form.Group className="mb-3" controlId="formBasicPassword">
                 <Form.Label>Search Query</Form.Label>
                 <Form.Control type="search" placeholder="" />
             </Form.Group>
-
-            {this.props.appName}
+            {chart}
             {transactions}
         </div>
     }
 
+    async queryGraph() {
+        const graphSql=`SELECT 
+  strftime('%Y-%m-%d %H:%M:%S', COALESCE(CAST(strftime('%s', LogTime) / 300 AS INTEGER), 'N/A') * 300, 'unixepoch') AS bucket,
+  COUNT(*) AS count
+FROM LogEntry
+WHERE LogTime >= datetime('now', '-1 hour')
+GROUP BY bucket
+ORDER BY bucket ASC`
+
+        let result = await this.api.query(graphSql)
+
+        if (!result) {
+            this.setState({error: "Failed to fetch latest graph data"})
+            return
+        }
+
+        this.setState({graphQuery: result})
+    }
+
     async queryAll() {
-        const sql = `SELECT DISTINCT ContextID from LogEntry WHERE Application="${this.props.appName}" LIMIT 100;`
+        const sql = `SELECT DISTINCT ContextID from LogEntry WHERE Application="${this.props.appName}" AND LogTime >= datetime('now', '-1 hour');`
 
         let result = await this.api.query(sql)
         if (!result) {

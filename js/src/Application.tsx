@@ -67,8 +67,8 @@ export class Application extends Component<ApplicationProps, ApplicationState> {
             chart = <Plot
             data={[
               {
-                x: this.state.graphQuery.rows[0],
-                y: this.state.graphQuery.rows[1],
+                x: this.state.graphQuery.rows.map(r => r[0]),
+                y: this.state.graphQuery.rows.map(r => r[1]),
                 type: 'bar',
               },
             ]}

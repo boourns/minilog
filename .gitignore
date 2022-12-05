@@ -1,7 +1,6 @@
 minilog
 .idea
 minilog.db
-static/
 db/
 config/development.json
 

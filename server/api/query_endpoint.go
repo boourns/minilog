@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"github.com/boourns/minilog/lib"
 	"net/http"
 )
@@ -24,15 +25,18 @@ func queryEndpoint(w http.ResponseWriter, r *http.Request) {
 
 	rows, err := database.Query(request.SQL)
 	if err != nil {
-		lib.Error(w, "database error", 500)
+		lib.Error(w, fmt.Sprintf("database error: %s", err), 500)
 		return
 	}
+
+	defer rows.Close()
 
 	result.Rows = make([][]string, 0)
 
 	result.Columns, err = rows.Columns()
 	if err != nil {
-		lib.Error(w, "error reading columns", 500)
+		lib.Error(w, fmt.Sprintf("error reading columns: %s", err), 500)
+		return
 	}
 
 	for rows.Next() {
@@ -44,12 +48,14 @@ func queryEndpoint(w http.ResponseWriter, r *http.Request) {
 			ptrRow[i] = &row[i]
 		}
 
-		rows.Scan(ptrRow...)
+		err = rows.Scan(ptrRow...)
+		if err != nil {
+			lib.Error(w, fmt.Sprintf("error reading row: %s", err), 500)
+			return
+		}
 
 		result.Rows = append(result.Rows, row)
 	}
-
-	rows.Close()
 
 	lib.RespondWith(true, result, w)
 }

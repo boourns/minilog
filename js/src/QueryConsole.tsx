@@ -1,5 +1,5 @@
 import { Component } from "preact"
-import { Button, Form, Spinner } from "react-bootstrap"
+import { Alert, Button, Form, Spinner } from "react-bootstrap"
 import { MinilogAPI, QueryResult } from "./api"
 import { resultTable } from "./ResultTable"
 
@@ -38,7 +38,11 @@ export class QueryConsole extends Component<ApplicationProps, QueryConsoleState>
         if (!this.state.results) {
             return <div>No results</div>
         } else {
-            return resultTable(this.state.results)
+            if (this.state.results.errors && this.state.results.errors.length > 0) {
+                return <Alert variant="danger">{this.state.results.errors.map(e => e.message).join(", ")}</Alert>
+            } else {
+                return resultTable(this.state.results)
+            }
         }
     }
 

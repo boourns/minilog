@@ -2,6 +2,10 @@
 
 set -e
 
+cd js
+yarn build
+cd ..
+
 cd server
 go build
 cd ..

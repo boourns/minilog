@@ -1,4 +1,5 @@
 export type QueryResult = {
+    errors: {message: string}[]
     columns: string[]
     rows: string[][]
 }

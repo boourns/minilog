@@ -11,8 +11,8 @@ type QueryRequest struct {
 }
 
 type QueryResponse struct {
-	Columns []string `json:"columns"`
-	Rows [][]string `json:"rows"`
+	Columns []string   `json:"columns"`
+	Rows    [][]string `json:"rows"`
 }
 
 func queryEndpoint(w http.ResponseWriter, r *http.Request) {
@@ -32,6 +32,11 @@ func queryEndpoint(w http.ResponseWriter, r *http.Request) {
 	defer rows.Close()
 
 	result.Rows = make([][]string, 0)
+
+	if err = rows.Err(); err != nil {
+		lib.Error(w, fmt.Sprintf("database error: %v", err), 500)
+		return
+	}
 
 	result.Columns, err = rows.Columns()
 	if err != nil {

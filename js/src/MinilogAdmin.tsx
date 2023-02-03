@@ -4,7 +4,8 @@ import {Router} from "preact-router";
 import { Container, Nav, Navbar } from 'react-bootstrap'
 import { Application } from "./Application";
 import { ApplicationList } from "./ApplicationList";
-import { QueryConsole } from "./QueryConsole";
+import { QueryConsole } from "./console/QueryConsole";
+import { Query } from "./console/Query";
 
 export class MinilogAdmin extends Component<any, any> {
     render() {

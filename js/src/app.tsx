@@ -6,5 +6,3 @@ console.log("welcome to minilog")
 import './admin.static.scss';
 
 render(<MinilogAdmin />, document.body)
-
-console.log("make it here?")

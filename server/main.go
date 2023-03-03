@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"database/sql"
+	"github.com/boourns/dblib"
 	"github.com/boourns/minilog/api"
 	"github.com/boourns/minilog/cfg"
 	"github.com/go-chi/chi"
@@ -32,6 +33,10 @@ func main() {
 		panic(err)
 	}
 	err = CreateLogEntryTable(database)
+	if err != nil {
+		panic(err)
+	}
+	err = CreateIndices(database)
 	if err != nil {
 		panic(err)
 	}
@@ -78,7 +83,7 @@ func startAdminServer(router chi.Router) {
 	initAuth(router, cfg.Config.GithubKey, cfg.Config.GithubSecret, cfg.Config.GithubCallbackURL)
 
 	router.HandleFunc("/static/*", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "./" + r.URL.Path)
+		http.ServeFile(w, r, "./"+r.URL.Path)
 		//w.Header().Set("Content-Type", "text/css")
 	})
 
@@ -99,4 +104,38 @@ func startAdminServer(router chi.Router) {
 
 		api.Register(router)
 	})
+}
+
+func CreateIndices(tx dblib.Queryable) error {
+	err := exec(tx, `CREATE INDEX IF NOT EXISTS field_logentry_key_value ON Field(LogEntryId, Key, Value);`)
+	if err != nil {
+		return err
+	}
+
+	err = exec(tx, `CREATE INDEX IF NOT EXISTS field_key_value ON Field(Key, Value);`)
+	if err != nil {
+		return err
+	}
+
+	err = exec(tx, `CREATE INDEX IF NOT EXISTS idx_logentry_contextid ON LogEntry(ContextId);`)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func exec(tx dblib.Queryable, sql string) error {
+	stmt, err := tx.Prepare(sql)
+
+	if err != nil {
+		return err
+	}
+
+	_, err = stmt.Exec()
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

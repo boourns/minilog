@@ -5,6 +5,7 @@ export class PageRunner {
     function!: Function;
     output: string = "";
     status?: string = "";
+    error?: string = "";
     callback: () => void;
 
     constructor(code: string, callback: () => void) {
@@ -16,9 +17,18 @@ export class PageRunner {
     }
 
     async run() {
-        this.function = new Function("sql", "print", "table", this.code);
-        const f = this.function(this.sql, this.print, this.table);
-        await f()
+        try {
+            this.function = new Function("sql", "print", "table", this.code);
+            const f = this.function(this.sql, this.print, this.table);
+            await f()
+        } catch (e: any) {
+            console.error(e)
+
+            this.error = e.toString()
+            this.status = "Error occurred: " + e.toString()
+            this.callback()
+        }
+        
     }
     
     async sql(code: string) {
@@ -65,6 +75,14 @@ export class PageRunner {
     }
 
     print(args: any) {
+        debugger
+
+        if (args instanceof Array) {
+            args = args.join("\n")
+        } else if (args instanceof Object) {
+            args = JSON.stringify(args, null, 2)
+        }
+
         this.output += args + "\n"
         this.callback()
     }

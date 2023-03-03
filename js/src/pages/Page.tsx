@@ -4,19 +4,24 @@ import style from "./Page.module.scss"
 import { PageRunner } from "./PageRunner";
 import { Pages, PageState, StoredPage } from "./Pages";
 
+import loader from '@monaco-editor/loader';
+
 interface PageViewProps {
     path: string
     id?: string
 }
 
 type PageViewState = {
-    code: string
     title: string
     modified: boolean
     error?: string
 }
 
 export class PageView extends Component<PageViewProps, PageViewState> {
+    monaco: any;
+    editorElement?: HTMLDivElement;
+    editor?: any
+    private _monacoChangeHandler: any;
 
     constructor(props: PageViewProps) {
         super(props);
@@ -25,9 +30,9 @@ export class PageView extends Component<PageViewProps, PageViewState> {
         this.resizeMouseMove = this.resizeMouseMove.bind(this);
     }
 
-    componentWillMount(): void {
+    getPage(id: string): StoredPage | undefined {
         const pages = Pages.load()
-        const page = pages.pages.find(p => p.id === this.props.id)
+        const page = pages.pages.find(p => p.id === id)
 
         if (page == null) {
             this.setState({
@@ -35,10 +40,75 @@ export class PageView extends Component<PageViewProps, PageViewState> {
             })
             return
         }
+
+        return page
+    }
+
+    async componentWillMount() {
+        const page = this.getPage(this.props.id!)
+
+        if (page == undefined) {
+            return
+        }
+
         this.setState({
-            code: page.code,
             title: page.title,
             modified: false
+        })
+
+        this.monaco = await loader.init()
+
+        this.createEditor(page.code)
+    }
+
+    async componentWillReceiveProps(nextProps: Readonly<PageViewProps>, nextContext: any) {
+        console.log("componentWillReceiveProps")
+
+        const page = this.getPage(nextProps.id!)
+        if (page == undefined) {
+            return
+        }
+
+        this.setState({
+            title: page.title,
+            modified: false
+        })
+
+        if (this.editor != undefined) {
+            this.editor.getModel()!.setValue(page.code)
+        } else {
+            this.createEditor(page.code)
+        }
+    }
+
+    setup(ref: HTMLDivElement | null) {
+        const page = this.getPage(this.props.id!)
+
+        if (page == undefined || ref == null || this.editorElement != undefined || ref == this.editorElement) {
+            return
+        }
+
+        this.editorElement = ref;
+
+        this.createEditor(page.code);
+    }
+
+    createEditor(initialCode: string) {
+        if (this.editorElement == undefined || this.monaco == undefined) {
+            return
+        }
+
+        this.editor = this.monaco.editor.create(this.editorElement, {
+            value: initialCode,
+            language: 'javascript',
+        });
+
+        const model = this.editor.getModel()!
+
+        this._monacoChangeHandler = model.onDidChangeContent((event: any) => {
+            this.setState({
+                modified: true
+            })
         })
     }
 
@@ -81,13 +151,6 @@ export class PageView extends Component<PageViewProps, PageViewState> {
         })
     }
 
-    codeChanged = (e: Event) => {
-        this.setState({
-            code: (e.target as HTMLTextAreaElement).value,
-            modified: true
-        })
-    }
-
     saveClicked = () => {
         const pages = Pages.load()
         const index = pages.pages.findIndex(p => p.id === this.props.id)
@@ -97,7 +160,7 @@ export class PageView extends Component<PageViewProps, PageViewState> {
         }
 
         pages.pages[index].title = this.state.title
-        pages.pages[index].code = this.state.code
+        pages.pages[index].code = this.editor.getValue()
 
         Pages.store(pages)
         this.setState({
@@ -111,7 +174,9 @@ export class PageView extends Component<PageViewProps, PageViewState> {
             return
         }
 
-        const runner = new PageRunner(this.state.code, () => {
+        const code = this.editor.getValue()
+
+        const runner = new PageRunner(code, () => {
             preview.innerHTML = runner.html() + "<br/>" + `<i>${runner.status}</i>`
         })
 
@@ -128,17 +193,15 @@ export class PageView extends Component<PageViewProps, PageViewState> {
         }
 
         return <div>
-            <input type="text" value={page.title} onChange={(e) => this.titleChanged(e)}/>
+            <input type="text" value={this.state.title} onChange={(e) => this.titleChanged(e)}/>
             <Button variant="danger" onClick={() => this.saveClicked()} disabled={!this.state.modified}>Save</Button>
             <Button onClick={() => this.runClicked()}>Run</Button>
 
             <div id="container" class={style.container}>
-        <div id="code" class={style.code} rows={20}>
-            <textarea class={style.codeTextArea} value={this.state.code} onChange={(e) => this.codeChanged(e)} />
-        </div>
-        <div id="resize" class={style["resize-handle"]} onMouseDown={(e) => this.resizeMouseDown(e)}></div>
-        <div id="preview" class={style.preview}>
-        </div>
+                <div id="code" class={style.code} style="height: 600px; width: 100%;" ref={(ref) => this.setup(ref)}></div>
+                <div id="resize" class={style["resize-handle"]} onMouseDown={(e) => this.resizeMouseDown(e)}></div>
+                <div id="preview" class={style.preview}>
+            </div>
       </div>
       </div>
     }
